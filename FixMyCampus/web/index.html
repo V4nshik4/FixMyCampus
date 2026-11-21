@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FixMyCampus</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="#">
+    <span class="brand-mark">F</span>
+    FixMyCampus <small>JIIT</small>
+  </a>
+  <nav>
+    <a href="#issues">Issues</a>
+    <a href="#how">How it works</a>
+  </nav>
+  <button class="btn-primary" onclick="openModal()">Report an issue ↗</button>
+</header>
+
+<!-- REPORT MODAL -->
+<div id="modal" class="overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <button class="close-btn" onclick="closeModal()">✕</button>
+    <div class="modal-label">REPORT AN ISSUE</div>
+    <h2>What needs fixing?</h2>
+    <p class="modal-sub">Fill in the details and your report goes live instantly.</p>
+    <form id="report-form">
+      <label>Your name<input name="name" required placeholder="e.g. Aditi Sharma"></label>
+      <label>Issue title<input name="title" required placeholder="Short description"></label>
+      <div class="row2">
+        <label>Category
+          <select name="category">
+            <option value="ELECTRICAL">⚡ Electrical</option>
+            <option value="PLUMBING">🚿 Plumbing</option>
+            <option value="CLEANLINESS">🧹 Cleanliness</option>
+            <option value="INTERNET">📶 Internet</option>
+            <option value="FURNITURE">🪑 Furniture</option>
+            <option value="OTHER">📌 Other</option>
+          </select>
+        </label>
+        <label>Severity
+          <select name="severity">
+            <option value="1">1 — Low</option>
+            <option value="2">2 — Moderate</option>
+            <option value="3" selected>3 — Noticeable</option>
+            <option value="4">4 — High</option>
+            <option value="5">5 — Urgent</option>
+          </select>
+        </label>
+      </div>
+      <label>Location<input name="location" required placeholder="Building / floor / area"></label>
+      <label>Description<textarea name="description" required rows="3" placeholder="What's happening?"></textarea></label>
+      <button class="btn-primary full" type="submit">Submit report ↗</button>
+      <div id="form-msg"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ADMIN RESOLVE MODAL -->
+<div id="admin-modal" class="overlay" onclick="if(event.target===this)closeAdminModal()">
+  <div class="modal-box narrow">
+    <button class="close-btn" onclick="closeAdminModal()">✕</button>
+    <div class="modal-label">RESOLVE ISSUE</div>
+    <h2>Confirm resolution</h2>
+    <p class="modal-sub">Enter admin password, or this resolves if you're the reporter.</p>
+    <label>Admin password<input id="admin-pass" type="password" placeholder="admin123"></label>
+    <button class="btn-primary full" onclick="confirmResolve()">Mark resolved ✓</button>
+    <div id="admin-msg"></div>
+  </div>
+</div>
+
+<main>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <div class="label">JIIT COMMUNITY PLATFORM</div>
+      <h1>See something?<br><em>Let's fix it.</em></h1>
+      <p>Report campus problems, rally support, and track every issue through to resolution.</p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="openModal()">Report an issue ↗</button>
+        <a class="btn-ghost" href="#issues">Browse issues</a>
+      </div>
+      <div class="trust-row">
+        <div class="trust-item"><span class="trust-icon">🏫</span><span>JIIT Campus</span></div>
+        <div class="trust-item"><span class="trust-icon">👥</span><span>Community-driven</span></div>
+        <div class="trust-item"><span class="trust-icon">⚡</span><span>Instant reporting</span></div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-stats">
+        <div class="stat-card"><strong id="total-count">0</strong><span>Reported</span></div>
+        <div class="stat-card"><strong id="active-count">0</strong><span>Need attention</span></div>
+        <div class="stat-card"><strong id="resolved-count">0</strong><span>Resolved</span></div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label">
+          <span>Resolution rate</span>
+          <span id="res-pct">0%</span>
+        </div>
+        <div class="progress-track"><div class="progress-bar" id="res-bar" style="width:0%"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRENDING -->
+  <section class="trending" id="trending">
+    <div class="trending-inner">
+      <div class="trending-label">🔥 TRENDING RIGHT NOW</div>
+      <div id="trending-list" class="trending-cards"></div>
+    </div>
+  </section>
+
+  <!-- ISSUES BOARD -->
+  <section id="issues" class="board">
+    <div class="board-head">
+      <div>
+        <div class="label">COMMUNITY BOARD</div>
+        <h2>What needs fixing?</h2>
+      </div>
+      <button class="btn-primary" onclick="openModal()">Report something ↗</button>
+    </div>
+    <div class="controls">
+      <div class="tabs">
+        <button class="tab active" data-filter="all">All issues <span id="all-num">0</span></button>
+        <button class="tab" data-filter="active">🔥 Needs attention</button>
+        <button class="tab" data-filter="RESOLVED">✓ Resolved</button>
+      </div>
+      <select id="sort">
+        <option value="priority">Most supported</option>
+        <option value="newest">Newest first</option>
+      </select>
+    </div>
+    <!-- CATEGORY PILLS -->
+    <div class="cat-pills" id="cat-pills">
+      <button class="pill active" data-cat="ALL">All</button>
+      <button class="pill" data-cat="ELECTRICAL">⚡ Electrical</button>
+      <button class="pill" data-cat="PLUMBING">🚿 Plumbing</button>
+      <button class="pill" data-cat="CLEANLINESS">🧹 Cleanliness</button>
+      <button class="pill" data-cat="INTERNET">📶 Internet</button>
+      <button class="pill" data-cat="FURNITURE">🪑 Furniture</button>
+      <button class="pill" data-cat="OTHER">📌 Other</button>
+    </div>
+    <div id="issue-list" class="grid"></div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how" class="how">
+    <div class="label center">HOW IT WORKS</div>
+    <h2>From "I noticed" to <em>"It's fixed."</em></h2>
+    <div class="steps">
+      <div class="step"><span>01</span><h3>Report it</h3><p>Share what's wrong and where. A little detail goes a long way.</p></div>
+      <div class="step"><span>02</span><h3>Rally support</h3><p>Others upvote issues they care about — the most-backed rise to the top.</p></div>
+      <div class="step"><span>03</span><h3>Track the fix</h3><p>Follow the status and see when it's finally resolved.</p></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span class="brand">
+    <span class="brand-mark sm">F</span> FixMyCampus
+  </span>
+  <span>Better campus, together. &nbsp;·&nbsp; JAVA OOP LAB 2026</span>
+  <div class="footer-info">
+    <span> Report issues and rally support from your campus community</span>
+    <span>Issues with 25+ votes or open for 3+ days are flagged as "Needs Attention"</span>
+    <span>✓ Reporters and admins (password: <code>admin123</code>) can mark issues resolved</span>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html> 
